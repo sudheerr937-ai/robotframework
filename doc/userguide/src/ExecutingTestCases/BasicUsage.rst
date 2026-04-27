@@ -241,8 +241,8 @@ from highest to lowest, is `AND`, `OR` and `NOT`::
 
 .. note:: Starting from Robot Framework 8.0, operators need to be separated from
           tags with spaces like `X OR Y` or tags must be used in lower case like
-          `xORy`. Using patterns like `XORY` still works with Robot Framework 7.5,
-          but such usages are deprecated.
+          `xORy`. Patterns like `XORY` are no longer supported and are treated
+          as literal tag names.
 
 .. note:: Older Robot Framework versions support `&` operator as an alias for `AND`.
           This was deprecated in Robot Framework 7.5 and the support will be removed

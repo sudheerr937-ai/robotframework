@@ -379,21 +379,10 @@ class TestTagPatterns(unittest.TestCase):
             assert_equal(TagPatterns(pattern).match("X"), expected)
             assert_equal(TagPatterns(pattern.replace(" ", " ")).match("X"), expected)
 
-    def test_deprecated_operator_usage(self):
-        for pattern, expected in [
-            ("XANDY", False),
-            ("XORY", True),
-            ("XNOTY", True),
-            ("NOTXORYANDZ", False),
-        ]:
-            with warnings.catch_warnings(record=True) as w:
-                assert_equal(TagPatterns(pattern).match("X"), expected)
-            assert_equal(w[0].category, UserWarning)
-            assert_true(
-                str(w[0].message).startswith(
-                    f"The behavior of tag pattern '{pattern}' will change"
-                )
-            )
+    def test_xory_style_patterns_are_literal(self):
+        for pattern in ["XANDY", "XORY", "XNOTY", "NOTXORYANDZ"]:
+            assert_false(TagPatterns(pattern).match("X"))
+            assert_true(TagPatterns(pattern).match(pattern))
 
     def test_str(self):
         for pattern in [
@@ -468,3 +457,4 @@ class AndOrPatternGenerator:
 
 if __name__ == "__main__":
     unittest.main()
+    

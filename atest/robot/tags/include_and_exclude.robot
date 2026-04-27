@@ -118,11 +118,10 @@ Suite containing tasks is ok if only tests are selected
     --include test    Test    sources=rpa/tasks rpa/tests.robot
     --exclude task    Test    sources=rpa/tasks rpa/tests.robot
 
-Deprecated operator usage
-    [Template]    Validate deprecated operator warning
-    --include    INCL1AND*    AND
-    --exclude    e*ORBAD      OR
-    --include    i*NOTBAD     NOT
+XORY style patterns are treated as literals
+    [Template]    Run And Check Error
+    --include    INCL1AND*    tag 'INCL1AND*'
+    --include    i*NOTBAD     tag 'i*NOTBAD'
 
 Deprecated & operator
     [Template]    Validate deprecated operator warning
@@ -139,14 +138,8 @@ Run And Check Include And Exclude
 Validate deprecated operator warning
     [Arguments]    ${option}    ${pattern}    ${operator}
     Run And Check Include And Exclude    ${option} ${pattern}    @{INCL_ALL}    warnings=True
-    IF    $operator == '&'
-        VAR    ${explanation}
-        ...    Boolean operator '&' is deprecated, use 'AND' instead.
-    ELSE
-        VAR    ${explanation}
-        ...    '${operator}' is currently considered to be a Boolean operator, but in the future
-        ...    operators must be surrounded with spaces or tag names must be lower case.
-    END
+    VAR    ${explanation}
+    ...    Boolean operator '&' is deprecated, use 'AND' instead.
     VAR    ${expected}
     ...    Problems when ${{"including" if $option == "--include" else "excluding"}} tests by tags:
     ...    The behavior of tag pattern '${pattern}' will change in Robot Framework 8.0: ${explanation}

@@ -155,19 +155,16 @@ class TagPattern(ABC):
 
     @classmethod
     def from_string(cls, pattern: str, usage: "str | None" = None) -> "TagPattern":
-        """Create ``TagPattern`` object from string like ``tag``, ``t*`` or ``x OR y``.
-
-        ``usage`` is used in a deprecation warning if a pattern uses Boolean operators
-        in deprecated format like ``XORY``. It should only be used internally by
-        Robot Framework itself for giving context where the pattern was used. When
-        a usage is given, warning is logged using Robot's own global ``LOGGER`` and
-        otherwise the warning is logged using Python's ``logging`` module.
-        """
+        """Create ``TagPattern`` object from string like ``tag``, ``t*`` or ``x OR y``."""
         if "NOT" in pattern:
-            must_match, *must_not_match = cls._split(pattern, "NOT", usage)
-            return NotTagPattern(must_match, must_not_match)
+            tokens = cls._split(pattern, "NOT", usage)
+            if len(tokens) > 1:
+                must_match, *must_not_match = tokens
+                return NotTagPattern(must_match, must_not_match)
         if "OR" in pattern:
-            return OrTagPattern(cls._split(pattern, "OR", usage))
+            tokens = cls._split(pattern, "OR", usage)
+            if len(tokens) > 1:
+                return OrTagPattern(tokens)
         if "&" in pattern:
             cls._deprecated(
                 pattern,
@@ -176,7 +173,9 @@ class TagPattern(ABC):
             )
             pattern = pattern.replace("&", " AND ")
         if "AND" in pattern:
-            return AndTagPattern(cls._split(pattern, "AND", usage))
+            tokens = cls._split(pattern, "AND", usage)
+            if len(tokens) > 1:
+                return AndTagPattern(tokens)
         return SingleTagPattern(pattern)
 
     @classmethod
@@ -184,14 +183,7 @@ class TagPattern(ABC):
         tokens = f" {pattern} ".split(operator)
         for token in tokens:
             if not cls._validate(token, operator):
-                cls._deprecated(
-                    pattern,
-                    f"'{operator}' is currently considered to be a Boolean operator, "
-                    f"but in the future operators must be surrounded with spaces or "
-                    f"tag names must be lower case.",
-                    usage,
-                )
-                break
+                return [pattern]
         return tokens
 
     @classmethod
@@ -330,3 +322,4 @@ def normalize_tags(tags: Iterable[str]) -> Iterable[str]:
 
 class NormalizedTags(list):
     pass
+    
